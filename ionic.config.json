@@ -1,0 +1,7 @@
+{
+  "name": "MisSitios",
+  "integrations": {
+    "cordova": {}
+  },
+  "type": "ionic-angular"
+}
