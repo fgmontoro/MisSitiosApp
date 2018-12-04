@@ -38,18 +38,39 @@ export class HomePage {
       }
     };
   
-    this.map = this.googleMaps.create('map_canvas', mapOptions);
+    this.map = GoogleMaps.create('map_canvas', mapOptions);
   
     // Wait the MAP_READY before using any methods.
     this.map.one(GoogleMapsEvent.MAP_READY)
     .then(() => {
       // Now you can use all methods safely.
       this.getPosition();
+      this.map.on(GoogleMapsEvent.MAP_CLICK).subscribe(
+          (data) => {
+            this.map.clear();
+            this.map.addMarker({
+              title: 'My Position',
+              icon: 'blue',
+              animation: 'DROP',
+              position: data[0]
+            });
+          }
+      );
     })
     .catch(error =>{
       console.log(error);
     });
   
+  }
+
+  addMarker(data): void {
+    this.map.clear();
+    this.map.addMarker({
+      title: 'My Position',
+      icon: 'blue',
+      animation: 'DROP',
+      position: data.latLng
+    });
   }
 
   getPosition(): void{
