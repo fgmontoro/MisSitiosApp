@@ -9,6 +9,7 @@ import {
   MarkerOptions,
   Marker
 } from '@ionic-native/google-maps';
+import { AngularFireDatabase } from 'angularfire2/database';
 
 @Component({
   selector: 'page-home',
@@ -16,13 +17,38 @@ import {
 })
 export class HomePage {
   map: GoogleMap;
+  topics = [];
+  name: string;
+  talks = [];
+  preparedTags = [
+    '#Ionic',
+    '#Angular',
+    '#Javascript',
+    '#Mobile',
+    '#Hybrid',
+    '#CrossPlatform'
+  ];
+  site = {
+    url: ['d','f'],
+    description: 'Java Technology - Spring Framework'
+  };
+  position: any;
 
-  constructor(private navCtrl: NavController, private googleMaps: GoogleMaps) {
-
+  constructor(private navCtrl: NavController, private googleMaps: GoogleMaps, public db: AngularFireDatabase) {
+    //this.db.list('sitios').push(this.site); 
   }
 
   ionViewDidLoad(){
     this.loadMap();
+  }
+
+  addTalk() {
+    this.talks.push({name: this.name, topics: this.topics});
+    let reg =  {
+      position: this.position,
+      tags : this.topics
+    };
+    this.db.list('sitios').push(reg);
   }
 
   loadMap(){
@@ -48,6 +74,7 @@ export class HomePage {
       this.map.on(GoogleMapsEvent.MAP_CLICK).subscribe(
           (data) => {
             this.map.clear();
+            this.position = data[0];
             this.map.addMarker({
               title: 'My Position',
               icon: 'blue',
