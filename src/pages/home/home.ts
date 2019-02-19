@@ -9,14 +9,33 @@ import {
   MarkerOptions,
   Marker
 } from '@ionic-native/google-maps';
-import { AngularFireDatabase } from 'angularfire2/database';
+import { AngularFireDatabase, AngularFireList } from '@angular/fire/database';
+import { Observable } from 'rxjs-compat';
+import { map } from 'rxjs-compat/operators';
 
 @Component({
   selector: 'page-home',
   templateUrl: 'home.html'
 })
 export class HomePage {
+
+  /*--------------------------------------------*/
+  addItem(newName: string) {
+    this.itemsRef.push({ text: newName });
+  }
+  updateItem(key: string, newText: string) {
+    this.itemsRef.update(key, { text: newText });
+  }
+  deleteItem(key: string) {
+    this.itemsRef.remove(key);
+  }
+  deleteEverything() {
+    this.itemsRef.remove();
+  }
+  /*--------------------------------------------*/
   map: GoogleMap;
+  itemsRef: AngularFireList<any>;
+  items: Observable<any[]>;
   topics = [];
   name: string;
   talks = [];
@@ -33,13 +52,25 @@ export class HomePage {
     description: 'Java Technology - Spring Framework'
   };
   position: any;
+  markers:Observable<any>;
 
   constructor(private navCtrl: NavController, private googleMaps: GoogleMaps, public db: AngularFireDatabase) {
-    //this.db.list('sitios').push(this.site); 
+    this.itemsRef = db.list('sitios');
+    // Use snapshotChanges().map() to store the key
+    this.items = this.itemsRef.snapshotChanges().pipe(
+      map(changes => 
+        changes.map(c => ({ key: c.payload.key, ...c.payload.val() }))
+      )
+    );
   }
 
   ionViewDidLoad(){
-    this.loadMap();
+    // this.loadMap();
+    //this.markers = this.db.list('sitios').valueChanges();
+  }
+
+  showDatabase() {
+    //this.markers = this.db.list('sitios').valueChanges();
   }
 
   addTalk() {
